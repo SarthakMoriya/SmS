@@ -143,7 +143,6 @@ export const updateRecord = async (req, res) => {
 
 export const downloadRecord = (req, res) => {
   try {
-    console.log(req.body.data)
     createPDF(req.body.data);
     res.status(200).json({ message: "Record" });
   } catch (error) {

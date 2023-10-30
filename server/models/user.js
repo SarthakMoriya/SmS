@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Must make a SecretKey"],
       unique: true,
     },
+    picturePath:{type: String, required: [true, "Picture is required"]}
   },
   { timestamps: true }
 );

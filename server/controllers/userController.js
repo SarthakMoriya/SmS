@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 
 export const signup = async (req, res) => {
   try {
-    console.log("Signup request")
-    const { username, password, email,passcode } = req.body;
+    console.log(req.body)
+    const { username, password, email,passcode,picturePath} = req.body;
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -19,7 +19,8 @@ export const signup = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      passcode
+      passcode,
+      picturePath
     });
 
     // You should not call User.save() here, as you have already created the user.

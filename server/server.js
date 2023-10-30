@@ -1,16 +1,41 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from 'cors'
-
+import cors from "cors";
+import path from "path";
+import multer from "multer";
+import bodyParser from "body-parser";
+import { fileURLToPath } from "url";
 import recordRouter from "./routes/recordRouter.js"; // Update this import statement
-import userRouter from './routes/auth.js'
+import userRouter from "./routes/auth.js";
+import { signup } from "./controllers/userController.js";
 
+/**CONFIGURATIONS */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true })); // Increase limit as needed
+app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+
+/**FILE STORAGE */
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage });
 
 app.use("/records", recordRouter);
-app.use('/auth',userRouter)
+app.post("/auth/signup", upload.single("image"), signup);
+app.use("/auth", userRouter);
+
 mongoose
   .connect(
     "mongodb+srv://sarthak:o5KGgVlBSMYcuvIn@cluster0.vrzv9dm.mongodb.net/?retryWrites=true&w=majority"
@@ -21,4 +46,4 @@ mongoose
 
 app.listen(8000, () => {
   console.log("Server listening on PORT: 8000");
-})
+});
