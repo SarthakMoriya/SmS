@@ -1,17 +1,18 @@
 import Record from "../models/record.js";
+import { createPDF } from "../utils/pdfMaker.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
 
 export const createRecord = async (req, res) => {
   try {
     // http://localhost:8000/records/createrecord
-    console.log("REQUEST RECIEVED")
+    console.log("REQUEST RECIEVED");
     const record = await Record.create({ ...req.body });
     await record.save();
     // Sending the record created as response
     res.status(200).json(record);
   } catch (error) {
-    res.status(404).json({ message: error.message,error });
+    res.status(404).json({ message: error.message, error });
   }
 };
 
@@ -66,7 +67,7 @@ export const deleteRecordExam = async (req, res) => {
   try {
     // localhost:8000/records/deleterecordexam
     const { id } = req.body.id;
-    console.log(id)
+    console.log(id);
     // Fetching record from Database matching req.body.id
     const record = await Record.findById({ _id: id });
     // If wrong record Id was passed. Send Error message back to user
@@ -102,7 +103,7 @@ export const getRecord = async (req, res) => {
     const record = await Record.findById(id);
 
     //If wrong recordId was send
-    if (!record) res.status(500).json({ message: "Record not found!" });
+    if (!record) return res.status(500).json({ message: "Record not found!" });
 
     //Sending back record found
     res.status(200).json({ data: record });
@@ -117,8 +118,36 @@ export const deleteRecord = async (req, res) => {
     // http://localhost:8080/records/deleterecord/:id
     // Deleting record by record id as in req.params.id
     await Record.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Record deleted!" });
+    return res.status(200).json({ message: "Record deleted!" });
   } catch (error) {
-    res.status(404).json({ message: "Record not found!" });
+    return res.status(404).json({ message: "Record not found!" });
+  }
+};
+
+//-------------------------------UPDATE ENTIRE RECORD----------------------------- */
+
+export const updateRecord = async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const record = await Record.findById(req.params.id);
+    console.log(record);
+    //If wrong recordId was send
+    if (!record) return res.status(500).json({ message: "Record not found!" });
+
+    await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
+    res.status(200).json({ message: "Record updated" });
+  } catch (error) {
+    return res.status(404).json({ message: "Record not found!" });
+  }
+};
+
+export const downloadRecord = (req, res) => {
+  try {
+    console.log(req.body.data)
+    createPDF(req.body.data);
+    res.status(200).json({ message: "Record" });
+  } catch (error) {
+    res.status(200).json({ message: "Record" });
+
   }
 };
