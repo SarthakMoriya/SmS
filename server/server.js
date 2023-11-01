@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.post('/upload', upload.single("image"),(req,res)=>{
-  if (req.image) {
+  if (req.file) {
     res.json({ message: 'Image uploaded successfully', filename: req.file.filename });
   } else {
     res.status(400).json({ message: 'No file selected' });
