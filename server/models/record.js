@@ -12,6 +12,10 @@ const record = new mongoose.Schema(
     },
     teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     exams: [{}],
+    imageName: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
@@ -19,4 +23,3 @@ const record = new mongoose.Schema(
 const studentRecord = mongoose.model("stuRecord", record);
 
 export default studentRecord;
-

@@ -7,6 +7,7 @@ export const createRecord = async (req, res) => {
   try {
     // http://localhost:8000/records/createrecord
     console.log("REQUEST RECIEVED");
+
     const record = await Record.create({ ...req.body });
     await record.save();
     // Sending the record created as response
@@ -141,12 +142,23 @@ export const updateRecord = async (req, res) => {
   }
 };
 
+//-------------------------------DOWNLOAD RECORD----------------------------- */
+
 export const downloadRecord = (req, res) => {
   try {
     createPDF(req.body.data);
     res.status(200).json({ message: "Record" });
   } catch (error) {
     res.status(200).json({ message: "Record" });
-
   }
+};
+
+//-------------------------------FETCH RECORDS OF A TEACHER----------------------------- */
+export const getTeacherRecords = async (req, res) => {
+  try {
+    console.log("hihihih");
+    const records = await Record.find({ teacherId: req.params.id });
+    console.log(records);
+    res.status(404).send({ message: "No Records", records });
+  } catch (error) {}
 };
