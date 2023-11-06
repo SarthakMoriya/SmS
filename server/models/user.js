@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     role: {
-      enum: ["teacher", "student"],
+      type: String,
+      default: "student",
     },
     passcode: {
       type: String,
@@ -30,6 +31,8 @@ const userSchema = new mongoose.Schema(
       required: [false, "Picture is required"],
       default: "",
     },
+    isAdminApprovedAccount: { type: Boolean, default: false },
+    verified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -19,6 +19,8 @@
     "jspdf": "^2.5.1",
     "mongoose": "^7.6.3",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.0.1"
+    "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.1",
+    "otp-generator": "^4.0.1"
   }
 }

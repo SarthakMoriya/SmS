@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { sendOtp } from "../utils/otpService.js";
 
 // SIGNUP
 export const signup = async (req, res) => {
@@ -41,12 +42,13 @@ export const signup = async (req, res) => {
 // LOGIN
 export const login = async (req, res) => {
   try {
-    console.log("hi");
     const { email, password } = req.body;
-    console.log(email,password);
+    console.log(email, password);
     const isValidUser = await User.findOne({ email });
     if (!isValidUser) {
-      return res.status(403).json({ message: "Invalid Credentials!",error:"Invalid Email" });
+      return res
+        .status(403)
+        .json({ message: "Invalid Credentials!", error: "Invalid Email" });
     }
 
     const isValidPassword = await bcrypt.compare(
@@ -55,7 +57,9 @@ export const login = async (req, res) => {
     );
 
     if (!isValidPassword) {
-      return res.status(403).json({ message: "Invalid Credentials!",error:"Wrong password" });
+      return res
+        .status(403)
+        .json({ message: "Invalid Credentials!", error: "Wrong password" });
     }
 
     const token = jwt.sign(
@@ -71,7 +75,9 @@ export const login = async (req, res) => {
       user: isValidUser,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error creating account",error: error });
+    return res
+      .status(500)
+      .json({ message: "Error creating account", error: error });
   }
 };
 
@@ -132,4 +138,104 @@ export const changePasscode = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message, ok: false });
   }
+};
+
+// VERIFY EMAIL
+
+export const verifyEmail = (req, res) => {
+  try {
+    const { email } = req.body;
+    const data = sendOtp({ email });
+
+    res
+      .status(200)
+      .json({ message: "OTP sent successfully", ok: true, otp: data.otp });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to verify email", ok: false });
+  }
+};
+
+//VERIFY ACCOUNT AFTER OPT
+export const verifyAccount = async (req, res) => {
+  try {
+    const id = req.body.id;
+    console.log(id);
+    const user = await User.findById(id);
+    if (!user) return res.status(404).send({ message: "User not found" });
+    user.verified = true;
+    await user.save();
+    console.log(user);
+    res.status(200).send("OK");
+  } catch (error) {
+    res.status(400).send("error");
+  }
+};
+
+// ADMIN LOGIN
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log(email, password);
+    if (email === "sarthak8544@gmail.com" && password === "test") {
+      const isAdmin = await User.findOne({ email });
+      if (!isAdmin) return res.status(404).send("Invalid Credentials");
+
+      const token = jwt.sign({ id: isAdmin._id, email }, "topendseretpassword");
+
+      return res
+        .status(200)
+        .json({ token, user: isAdmin, admin: true, secretkey: 1234 });
+    } else {
+      return res.staus(500).send("Error");
+    }
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+// ACCOUNTS TO BE APPROVED BY ADMIN
+
+export const approveAccounts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id, req.params);
+    const account = await User.findById(id);
+    if (!account)
+      return res.status(404).json({ error: "Invalid Teacher Account!" });
+    account.isAdminApprovedAccount = true;
+    await account.save();
+    res.send({});
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+//  UNAPPROVED ACCOUNTS
+export const getUnapprovedAccounts = async (req, res) => {
+  try {
+    const unapprovedAccounts = await User.find({
+      isAdminApprovedAccount: false,
+    });
+    console.log(unapprovedAccounts);
+    res.send(unapprovedAccounts);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+// REJECT A TEACHER ACCOUNT
+export const deleteUnapprovedAccounts = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.send("Teacher Account deleted");
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
+
+// GET ALL TYPES OF ACCOUNTS
+
+export const getAllAccounts = async (req, res) => {
+  const accounts = await User.find({ role: "student" });
+  res.send(accounts);
 };
