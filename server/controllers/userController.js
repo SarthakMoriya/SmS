@@ -48,7 +48,11 @@ export const login = async (req, res) => {
     if (!isValidUser) {
       return res
         .status(403)
-        .json({ message: "Invalid Credentials!", error: "Invalid Email" });
+        .json({
+          message: "Invalid Credentials!",
+          error: "Invalid Email",
+          ok: false,
+        });
     }
 
     const isValidPassword = await bcrypt.compare(
@@ -59,7 +63,7 @@ export const login = async (req, res) => {
     if (!isValidPassword) {
       return res
         .status(403)
-        .json({ message: "Invalid Credentials!", error: "Wrong password" });
+        .json({ message: "Invalid Credentials!", error: "Wrong password" ,ok:false});
     }
 
     const token = jwt.sign(
@@ -73,11 +77,12 @@ export const login = async (req, res) => {
     return res.status(200).json({
       token,
       user: isValidUser,
+      ok:true
     });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Error creating account", error: error });
+      .json({ message: "Error creating account", error: error ,ok:false});
   }
 };
 
@@ -216,8 +221,8 @@ export const getUnapprovedAccounts = async (req, res) => {
     const unapprovedAccounts = await User.find({
       isAdminApprovedAccount: false,
     });
-    console.log(unapprovedAccounts);
-    res.send(unapprovedAccounts);
+
+    res.send(unapprovedAccounts|| []);
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -238,4 +243,5 @@ export const deleteUnapprovedAccounts = async (req, res) => {
 export const getAllAccounts = async (req, res) => {
   const accounts = await User.find({ role: "student" });
   res.send(accounts);
+  
 };

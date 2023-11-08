@@ -1,5 +1,5 @@
 import Record from "../models/record.js";
-import { createPDF } from "../utils/pdfMaker.js";
+import {  pdfMaker } from "../utils/pdfMaker.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
 
@@ -11,9 +11,9 @@ export const createRecord = async (req, res) => {
     const record = await Record.create({ ...req.body });
     await record.save();
     // Sending the record created as response
-    res.status(200).json(record);
+    res.status(200).json({record,ok:true});
   } catch (error) {
-    res.status(404).json({ message: error.message, error });
+    res.status(404).json({ message: error.message, error,ok:false });
   }
 };
 
@@ -146,7 +146,9 @@ export const updateRecord = async (req, res) => {
 
 export const downloadRecord = (req, res) => {
   try {
-    createPDF(req.body.data);
+    console.log(req.body.data)
+    // createPDF(req.body.data);
+    pdfMaker({name: req.body.data?.studentName,id:req.body.data?.id})
     res.status(200).json({ message: "Record" });
   } catch (error) {
     res.status(200).json({ message: "Record" });
