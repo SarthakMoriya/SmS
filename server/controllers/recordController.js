@@ -93,6 +93,15 @@ export const deleteRecordExam = async (req, res) => {
   }
 };
 
+export const updateRecordCertificate=async(req,res)=>{
+  try {
+    await Record.findByIdAndUpdate(req.body.id,{certificate:req.body.certificate})
+    res.send({})
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
+
 //-------------------------------GETTING SINGLE RECORD----------------------------- */
 
 export const getRecord = async (req, res) => {
@@ -164,3 +173,6 @@ export const getTeacherRecords = async (req, res) => {
     res.status(404).send({ message: "No Records", records });
   } catch (error) {}
 };
+
+
+// *********************************UPLOAD CERTIFICATE*********************************

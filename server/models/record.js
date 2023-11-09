@@ -16,6 +16,13 @@ const record = new mongoose.Schema(
       type: String,
       default: "",
     },
+    certificate: {
+      type: String,
+      default: "",
+    },
+    mainExamName: { type: String},
+    mainExamMT:{type:Number},
+    mainExamMO:{type:Number},
   },
   { timestamps: true }
 );

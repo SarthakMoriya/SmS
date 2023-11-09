@@ -8,6 +8,7 @@ import {
   getRecords,
   getTeacherRecords,
   updateRecord,
+  updateRecordCertificate,
   updateRecordExam,
 } from "../controllers/recordController.js";
 
@@ -16,6 +17,7 @@ const router = express.Router();
 
 router.get("/getrecords", getRecords);
 router.patch("/updaterecord", updateRecordExam);
+router.patch("/certificate",updateRecordCertificate);
 router.patch("/deleterecordexam", deleteRecordExam);
 router.get("/getrecord/:id", getRecord);
 router.delete("/deleterecord/:id", deleteRecord);

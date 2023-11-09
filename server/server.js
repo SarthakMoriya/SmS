@@ -18,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/pdfs', express.static(path.join(__dirname, 'uploads', 'pdfs')));
+
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true })); // Increase limit as needed
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
@@ -42,6 +43,7 @@ app.post('/upload', upload.single("image"),(req,res)=>{
 });
 
 app.post("/records/createrecord", upload.single("image"), createRecord);
+app.post("/records/savecertificate", upload.single("image"));
 app.post("/auth/signup", upload.single("image"), signup);
 
 app.use("/records", recordRouter);
