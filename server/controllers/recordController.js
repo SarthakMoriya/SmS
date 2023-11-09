@@ -1,19 +1,18 @@
 import Record from "../models/record.js";
-import {  pdfMaker } from "../utils/pdfMaker.js";
+import { pdfMaker } from "../utils/pdfMaker.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
 
 export const createRecord = async (req, res) => {
   try {
     // http://localhost:8000/records/createrecord
-    console.log("REQUEST RECIEVED");
 
     const record = await Record.create({ ...req.body });
     await record.save();
     // Sending the record created as response
-    res.status(200).json({record,ok:true});
+    res.status(200).json({ record, ok: true });
   } catch (error) {
-    res.status(404).json({ message: error.message, error,ok:false });
+    res.status(404).json({ message: error.message, error, ok: false });
   }
 };
 
@@ -93,14 +92,16 @@ export const deleteRecordExam = async (req, res) => {
   }
 };
 
-export const updateRecordCertificate=async(req,res)=>{
+export const updateRecordCertificate = async (req, res) => {
   try {
-    await Record.findByIdAndUpdate(req.body.id,{certificate:req.body.certificate})
-    res.send({})
+    await Record.findByIdAndUpdate(req.body.id, {
+      certificate: req.body.certificate,
+    });
+    res.send({});
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
-}
+};
 
 //-------------------------------GETTING SINGLE RECORD----------------------------- */
 
@@ -138,14 +139,33 @@ export const deleteRecord = async (req, res) => {
 
 export const updateRecord = async (req, res) => {
   try {
-    console.log(req.params.id);
     const record = await Record.findById(req.params.id);
-    console.log(record);
     //If wrong recordId was send
-    if (!record) return res.status(500).json({ message: "Record not found!" });
+    if (!record)
+      return res.status(500).json({ message: "Record not found!", ok: false });
 
-    await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
-    res.status(200).json({ message: "Record updated" });
+    //ASSUMING STUDENT ID WAS NOT UPDATED TO NEW ID
+    if (req.body.studentId == record.studentId) {
+      const record=await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
+      return res.status(200).json({ message: "Record updated",record, ok: true });
+    } else {
+      //IF STUDENT ID WAS ALSO UPDATED
+      //check if already used studentID was sent
+      const isUsedStudentId = await Record.findOne({
+        studentId: req.body.studentId,
+      });
+
+      //IF WE HAD USER WITH THAT STUDENTID SEND ERROR 
+      if (isUsedStudentId) {
+        return res
+          .status(500)
+          .json({ message: "Please Enter unique StudentId!", ok: false });
+      }else{
+        //NEW STUDENTID WAS NOT USED BY SOME OTHER RECORD SO UPDATED THE STUDENTID AS WELL AS OTHER DETAILS
+        const record=await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
+      return res.status(200).json({ message: "Record updated",record, ok: true });
+      }
+    }
   } catch (error) {
     return res.status(404).json({ message: "Record not found!" });
   }
@@ -155,9 +175,9 @@ export const updateRecord = async (req, res) => {
 
 export const downloadRecord = (req, res) => {
   try {
-    console.log(req.body.data)
+    console.log(req.body.data);
     // createPDF(req.body.data);
-    pdfMaker({name: req.body.data?.studentName,id:req.body.data?.id})
+    pdfMaker({ name: req.body.data?.studentName, id: req.body.data?.id });
     res.status(200).json({ message: "Record" });
   } catch (error) {
     res.status(200).json({ message: "Record" });
@@ -173,6 +193,5 @@ export const getTeacherRecords = async (req, res) => {
     res.status(404).send({ message: "No Records", records });
   } catch (error) {}
 };
-
 
 // *********************************UPLOAD CERTIFICATE*********************************

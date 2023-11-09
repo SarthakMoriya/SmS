@@ -6,15 +6,21 @@ import { sendOtp } from "../utils/otpService.js";
 // SIGNUP
 export const signup = async (req, res) => {
   try {
-    console.log(req.body);
     const { username, password, email, passcode, picturePath } = req.body;
     const existingUser = await User.findOne({ email });
+    const isSamePasscode = await User.findOne({ passcode });
 
     if (existingUser) {
       return res.status(400).json({
         message: "Existing User! Provide a Unique Email Address",
         ok: false,
       });
+    }
+    //Check Unique Secret Key
+    if (isSamePasscode) {
+      return res
+        .status(400)
+        .json({ message: "Please Provide Unique Secret Key", ok: false });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,16 +49,13 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
     const isValidUser = await User.findOne({ email });
     if (!isValidUser) {
-      return res
-        .status(403)
-        .json({
-          message: "Invalid Credentials!",
-          error: "Invalid Email",
-          ok: false,
-        });
+      return res.status(403).json({
+        message: "Invalid Credentials!",
+        error: "Invalid Email",
+        ok: false,
+      });
     }
 
     const isValidPassword = await bcrypt.compare(
@@ -61,9 +64,11 @@ export const login = async (req, res) => {
     );
 
     if (!isValidPassword) {
-      return res
-        .status(403)
-        .json({ message: "Invalid Credentials!", error: "Wrong password" ,ok:false});
+      return res.status(403).json({
+        message: "Invalid Credentials!",
+        error: "Wrong password",
+        ok: false,
+      });
     }
 
     const token = jwt.sign(
@@ -77,12 +82,12 @@ export const login = async (req, res) => {
     return res.status(200).json({
       token,
       user: isValidUser,
-      ok:true
+      ok: true,
     });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Error creating account", error: error ,ok:false});
+      .json({ message: "Error creating account", error: error, ok: false });
   }
 };
 
@@ -222,7 +227,7 @@ export const getUnapprovedAccounts = async (req, res) => {
       isAdminApprovedAccount: false,
     });
 
-    res.send(unapprovedAccounts|| []);
+    res.send(unapprovedAccounts || []);
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -243,5 +248,4 @@ export const deleteUnapprovedAccounts = async (req, res) => {
 export const getAllAccounts = async (req, res) => {
   const accounts = await User.find({ role: "student" });
   res.send(accounts);
-  
 };
