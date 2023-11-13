@@ -208,7 +208,7 @@ export const adminLogin = async (req, res) => {
 export const approveAccounts = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id, req.params);
+
     const account = await User.findById(id);
     if (!account)
       return res.status(404).json({ error: "Invalid Teacher Account!" });

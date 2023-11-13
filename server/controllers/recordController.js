@@ -114,7 +114,8 @@ export const getRecord = async (req, res) => {
     const record = await Record.findById(id);
 
     //If wrong recordId was send
-    if (!record) return res.status(500).json({ message: "Record not found!" });
+    if (!record)
+      return res.status(500).json({ message: "Record not found!", ok: false });
 
     //Sending back record found
     res.status(200).json({ data: record });
@@ -146,8 +147,13 @@ export const updateRecord = async (req, res) => {
 
     //ASSUMING STUDENT ID WAS NOT UPDATED TO NEW ID
     if (req.body.studentId == record.studentId) {
-      const record=await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
-      return res.status(200).json({ message: "Record updated",record, ok: true });
+      const record = await Record.findByIdAndUpdate(
+        { _id: req.params.id },
+        { ...req.body }
+      );
+      return res
+        .status(200)
+        .json({ message: "Record updated", record, ok: true });
     } else {
       //IF STUDENT ID WAS ALSO UPDATED
       //check if already used studentID was sent
@@ -155,15 +161,20 @@ export const updateRecord = async (req, res) => {
         studentId: req.body.studentId,
       });
 
-      //IF WE HAD USER WITH THAT STUDENTID SEND ERROR 
+      //IF WE HAD USER WITH THAT STUDENTID SEND ERROR
       if (isUsedStudentId) {
         return res
           .status(500)
           .json({ message: "Please Enter unique StudentId!", ok: false });
-      }else{
+      } else {
         //NEW STUDENTID WAS NOT USED BY SOME OTHER RECORD SO UPDATED THE STUDENTID AS WELL AS OTHER DETAILS
-        const record=await Record.findByIdAndUpdate({ _id: req.params.id }, { ...req.body });
-      return res.status(200).json({ message: "Record updated",record, ok: true });
+        const record = await Record.findByIdAndUpdate(
+          { _id: req.params.id },
+          { ...req.body }
+        );
+        return res
+          .status(200)
+          .json({ message: "Record updated", record, ok: true });
       }
     }
   } catch (error) {
