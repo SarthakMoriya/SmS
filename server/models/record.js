@@ -4,7 +4,7 @@ const record = new mongoose.Schema(
   {
     studentName: String,
     studentCourse: String,
-    dateEnrolled: Date,
+    dateEnrolled: String,
     studentId: {
       type: String,
       required: true,
