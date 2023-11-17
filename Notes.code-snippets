@@ -1,0 +1,45 @@
+*******************************************************
+***********************USER AUTH***********************
+*******************************************************                                                                    
+/                       ----------      HOME SCREEN                
+/login                  ----------      LOGIN PAGE                 
+/signup                 ----------      SIGNUP PAGE                
+/mypanel                ----------      TO ACCESS TEACHER PANEL     
+
+
+***********************************************************
+***********************RECORD ROUTES***********************
+***********************************************************
+/create                 ----------      CREATE STUDENT RECORD
+/record/:id             ----------      TO GET PARTICULAR RECORD
+/record/edit/:id        ----------      TO EDIT PARTICULAR RECORD
+/record/pdf/:id         ----------      TO DOWNLAOD PDF OF PARTICULAR RECORD
+/record/certificate/:id ----------      TO DOWNLOAD CERTIFICATE OF PARTICULAR RECORD
+
+
+***********************************************************
+************************ADMIN ROUTES***********************
+***********************************************************
+/admin/login            ----------      ADMIN LOGIN PAGE
+/admin/panel            ----------      ADMIN HOME PAGE
+
+
+
+
+
+
+______________________________________________________________
+________________________BACKEND ROUTES________________________
+______________________________________________________________
+
+/auth/login
+/auth/signup
+/auth/changepassword
+/auth/changepasscode
+/auth/verifyemail
+/auth/verifyaccount
+/auth/admin/login
+/auth/admin/approvedaccounts/:id
+/auth/admin/getunapprovedaccounts
+/auth/admin/deleteunapprovedaccount/:id
+/auth/admin/getallaccounts
