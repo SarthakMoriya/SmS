@@ -186,8 +186,7 @@ export const updateRecord = async (req, res) => {
 
 export const downloadRecord = (req, res) => {
   try {
-    console.log(req.body.data);
-    // createPDF(req.body.data);
+
     pdfMaker({ name: req.body.data?.studentName, id: req.body.data?.id });
     res.status(200).json({ message: "Record" });
   } catch (error) {
