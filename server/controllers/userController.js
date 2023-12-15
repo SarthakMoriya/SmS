@@ -185,7 +185,7 @@ export const verifyAccount = async (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
+
     if (email === "sarthak8544@gmail.com" && password === "test") {
       const isAdmin = await User.findOne({ email });
       if (!isAdmin) return res.status(404).send("Invalid Credentials");
@@ -196,10 +196,10 @@ export const adminLogin = async (req, res) => {
         .status(200)
         .json({ token, user: isAdmin, admin: true, secretkey: 1234 });
     } else {
-      return res.staus(500).send("Error");
+      return res.status(500).json("Invalid Credentials");
     }
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: "Invalid Credentials"});
   }
 };
 
