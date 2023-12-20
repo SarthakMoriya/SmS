@@ -9,6 +9,7 @@ import recordRouter from "./routes/recordRouter.js"; // Update this import state
 import userRouter from "./routes/auth.js";
 import { signup } from "./controllers/userController.js";
 import { createRecord } from "./controllers/recordController.js";
+import "dotenv/config";
 
 /**CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +18,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use('/pdfs', express.static(path.join(__dirname, 'uploads', 'pdfs')));
+app.use("/pdfs", express.static(path.join(__dirname, "uploads", "pdfs")));
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true })); // Increase limit as needed
@@ -34,14 +35,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.post('/upload', upload.single("image"),(req,res)=>{
+app.post("/upload", upload.single("image"), (req, res) => {
   if (req.file) {
-    res.json({ message: 'Image uploaded successfully', filename: req.file.filename });
+    res.json({
+      message: "Image uploaded successfully",
+      filename: req.file.filename,
+    });
   } else {
-    res.status(400).json({ message: 'No file selected' });
+    res.status(400).json({ message: "No file selected" });
   }
 });
-
 app.post("/records/createrecord", upload.single("image"), createRecord);
 app.post("/records/savecertificate", upload.single("image"));
 app.post("/auth/signup", upload.single("image"), signup);
@@ -51,12 +54,12 @@ app.use("/auth", userRouter);
 
 mongoose
   .connect(
-    "mongodb+srv://sarthak:o5KGgVlBSMYcuvIn@cluster0.vrzv9dm.mongodb.net/?retryWrites=true&w=majority"
+    process.env.MONGODB_URL.replace("<password>", process.env.MONGODB_PASSWORD)
   )
   .then(() => {
     console.log("DB connection established");
   });
 
-app.listen(8000, () => {
+app.listen(process.env.PORT, () => {
   console.log("Server listening on PORT: 8000");
 });

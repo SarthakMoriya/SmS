@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  createRecord,
   deleteRecord,
   deleteRecordExam,
   downloadRecord,
@@ -14,8 +13,7 @@ import {
 
 const router = express.Router();
 
-
-router.get("/getrecords", getRecords);
+router.get("/getrecords" ,getRecords);
 router.patch("/updaterecord", updateRecordExam);
 router.patch("/certificate",updateRecordCertificate);
 router.patch("/deleterecordexam", deleteRecordExam);

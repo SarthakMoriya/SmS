@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { sendOtp } from "../utils/otpService.js";
-
+import 'dotenv/config'
 // SIGNUP
 export const signup = async (req, res) => {
   try {
@@ -73,7 +73,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { id: isValidUser._id, email: isValidUser.email },
-      "topendseretpassword",
+      process.env.JWT_PASSWORD,
       {
         expiresIn: "1h",
       }
@@ -120,7 +120,21 @@ export const changePassword = async (req, res) => {
   }
 };
 
-// CHANGE PASSCODE
+// FORGOT PASSWORD
+export const forgotPassword=async(req,res)=>{
+  try {
+    const {password,email} = req.body;
+    const isValidEmail=await User.findOne({ email: email});
+    if(!isValidEmail) return res.status(403).json({ message:"Invalid Email", ok: false });
+
+    const hashedPassword = await bcrypt.hash(password,12);
+    isValidEmail.password = hashedPassword;
+    await isValidEmail.save();
+    res.status(200).json({ message:"Password saved", ok: true });
+  } catch (error) {
+    res.status(500).json({ message:"ERROR UPDATING PASSWORD", ok: false });
+  }
+}
 
 export const changePasscode = async (req, res) => {
   try {

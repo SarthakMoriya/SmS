@@ -184,11 +184,15 @@ export const updateRecord = async (req, res) => {
 
 //-------------------------------DOWNLOAD RECORD----------------------------- */
 
-export const downloadRecord = (req, res) => {
+export const downloadRecord = async (req, res) => {
   try {
-
+    const { id } = req.body.data.id;
+    const record = await Record.findOne({ id: id });
+    console.log(record);
+    record.isDataUploaded = true;
+    await record.save();
     pdfMaker({ name: req.body.data?.studentName, id: req.body.data?.id });
-    res.status(200).json({ message: "Record" });
+    res.status(200).json({ message: "Record", record: record });
   } catch (error) {
     res.status(200).json({ message: "Record" });
   }

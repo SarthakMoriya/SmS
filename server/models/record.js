@@ -20,9 +20,10 @@ const record = new mongoose.Schema(
       type: String,
       default: "",
     },
-    mainExamName: { type: String},
-    mainExamMT:{type:Number},
-    mainExamMO:{type:Number},
+    mainExamName: { type: String },
+    mainExamMT: { type: Number },
+    mainExamMO: { type: Number },
+    isDataUploaded: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
