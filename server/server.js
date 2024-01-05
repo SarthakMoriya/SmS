@@ -56,7 +56,7 @@ app.use("/auth", userRouter);
 
 mongoose
   .connect(
-    process.env.MONGODB_URL.replace("<password>", process.env.MONGODB_PASSWORD)
+    process.env.MONGODB_URL?.replace("<password>", process.env.MONGODB_PASSWORD)
   )
   .then(() => {
     console.log("DB connection established");
