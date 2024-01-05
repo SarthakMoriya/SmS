@@ -1,5 +1,5 @@
 import express from "express";
-import { adminLogin, approveAccounts, changePasscode, changePassword, deleteUnapprovedAccounts, forgotPassword, getAllAccounts, getUnapprovedAccounts, login, signup, verifyAccount, verifyEmail } from "../controllers/userController.js";
+import { adminLogin, approveAccounts,editImage, changePasscode, changePassword, deleteUnapprovedAccounts, forgotPassword, getAllAccounts, getUnapprovedAccounts, login, signup, verifyAccount, verifyEmail } from "../controllers/userController.js";
 
 
 const router = express.Router();
@@ -16,5 +16,6 @@ router.get("/admin/approveaccounts/:id",approveAccounts)
 router.get("/admin/getunapprovedaccounts",getUnapprovedAccounts)
 router.get("/admin/deleteunapproveaccount/:id",deleteUnapprovedAccounts)
 router.get("/admin/getallaccounts",getAllAccounts)
+router.post('/editimage/:id',editImage)
 
 export default router;

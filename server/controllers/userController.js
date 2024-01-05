@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { sendOtp } from "../utils/otpService.js";
-import 'dotenv/config'
+import "dotenv/config";
 // SIGNUP
 export const signup = async (req, res) => {
   try {
@@ -121,20 +121,21 @@ export const changePassword = async (req, res) => {
 };
 
 // FORGOT PASSWORD
-export const forgotPassword=async(req,res)=>{
+export const forgotPassword = async (req, res) => {
   try {
-    const {password,email} = req.body;
-    const isValidEmail=await User.findOne({ email: email});
-    if(!isValidEmail) return res.status(403).json({ message:"Invalid Email", ok: false });
+    const { password, email } = req.body;
+    const isValidEmail = await User.findOne({ email: email });
+    if (!isValidEmail)
+      return res.status(403).json({ message: "Invalid Email", ok: false });
 
-    const hashedPassword = await bcrypt.hash(password,12);
+    const hashedPassword = await bcrypt.hash(password, 12);
     isValidEmail.password = hashedPassword;
     await isValidEmail.save();
-    res.status(200).json({ message:"Password saved", ok: true });
+    res.status(200).json({ message: "Password saved", ok: true });
   } catch (error) {
-    res.status(500).json({ message:"ERROR UPDATING PASSWORD", ok: false });
+    res.status(500).json({ message: "ERROR UPDATING PASSWORD", ok: false });
   }
-}
+};
 
 export const changePasscode = async (req, res) => {
   try {
@@ -213,7 +214,7 @@ export const adminLogin = async (req, res) => {
       return res.status(500).json("Invalid Credentials");
     }
   } catch (error) {
-    res.status(500).json({ error: "Invalid Credentials"});
+    res.status(500).json({ error: "Invalid Credentials" });
   }
 };
 
@@ -262,4 +263,16 @@ export const deleteUnapprovedAccounts = async (req, res) => {
 export const getAllAccounts = async (req, res) => {
   const accounts = await User.find({ role: "student" });
   res.send(accounts);
+};
+
+export const editImage = async (req, res) => {
+  try {
+    const user = await User.findById( req.params.id);
+  console.log(req.body);
+  user.picturePath = req.body.picturePath
+  await user.save()
+  res.status(200).send("Image Updated")
+  } catch (error) {
+    res.status(500).send("error")
+  }
 };

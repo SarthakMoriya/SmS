@@ -63,16 +63,17 @@ export const updateRecordExam = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+//-------------------------------DELETING SINGLE RECORD EXAM----------------------------- */
 export const deleteRecordExam = async (req, res) => {
   try {
     // localhost:8000/records/deleterecordexam
     const { id } = req.body.id;
-    console.log(id);
     // Fetching record from Database matching req.body.id
     const record = await Record.findById({ _id: id });
     // If wrong record Id was passed. Send Error message back to user
     if (!record) {
-      res.status(401).json({ message: "Record not found" });
+      res.status(401).json({ message: "Record not found",ok:false });
     }
 
     let exams = req.body.exams; //old exams array
@@ -86,9 +87,9 @@ export const deleteRecordExam = async (req, res) => {
     record.exams = newExams;
     await record.save();
 
-    res.status(201).json({ exams: newExams });
+    res.status(201).json({ exams: newExams,ok:true });
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ message: error.message,ok:false });
   }
 };
 
@@ -97,7 +98,7 @@ export const updateRecordCertificate = async (req, res) => {
     await Record.findByIdAndUpdate(req.body.id, {
       certificate: req.body.certificate,
     });
-    res.send({});
+    res.send("Certificate Uploaded");
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -118,7 +119,7 @@ export const getRecord = async (req, res) => {
       return res.status(500).json({ message: "Record not found!", ok: false });
 
     //Sending back record found
-    res.status(200).json({ data: record });
+    res.status(200).json({ data: record })
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
