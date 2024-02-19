@@ -1,4 +1,5 @@
 import express from "express";
+import { createClient } from "redis";
 import {
   deleteRecord,
   deleteRecordExam,

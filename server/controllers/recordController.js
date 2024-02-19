@@ -1,29 +1,47 @@
+import { response } from "express";
 import Record from "../models/record.js";
 import { pdfMaker } from "../utils/pdfMaker.js";
+import { client } from "../redis.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
+// http://localhost:8000/records/createrecord
 
 export const createRecord = async (req, res) => {
   try {
-    // http://localhost:8000/records/createrecord
-
     const record = await Record.create({ ...req.body });
     await record.save();
+
+    // PUSHING NEW RECORD TO CACHE
+    let records = JSON.parse(await client.get("records"));
+    if (Array.isArray(records) && records?.length > 0) {
+      records.push(record);
+      await client.set("records", JSON.stringify(records));
+    } else {
+      records.push(record);
+      await client.set("records", JSON.stringify(records));
+    }
     // Sending the record created as response
     res.status(200).json({ record, ok: true });
   } catch (error) {
+    console.log(error);
     res.status(404).json({ message: error.message, error, ok: false });
   }
 };
 
 //-------------------------------GETTING ALL RECORDS----------------------------- */
+// http://localhost:8000/records/getrecords
 
 export const getRecords = async (req, res) => {
   try {
-    // http://localhost:8000/records/getrecords
-    const records = await Record.find();
-    // Sending the records as response
-    res.status(200).json(records);
+    let records = JSON.parse(await client.get("records"));
+    if (Array.isArray(records) && records?.length > 0) {
+      return res.status(200).json(records);
+    } else {
+      records = await Record.find();
+      await client.set("records", JSON.stringify(records));
+      // Sending the records as response
+      res.status(200).json(records);
+    }
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -73,7 +91,7 @@ export const deleteRecordExam = async (req, res) => {
     const record = await Record.findById({ _id: id });
     // If wrong record Id was passed. Send Error message back to user
     if (!record) {
-      res.status(401).json({ message: "Record not found",ok:false });
+      res.status(401).json({ message: "Record not found", ok: false });
     }
 
     let exams = req.body.exams; //old exams array
@@ -87,9 +105,9 @@ export const deleteRecordExam = async (req, res) => {
     record.exams = newExams;
     await record.save();
 
-    res.status(201).json({ exams: newExams,ok:true });
+    res.status(201).json({ exams: newExams, ok: true });
   } catch (error) {
-    res.status(404).json({ message: error.message,ok:false });
+    res.status(404).json({ message: error.message, ok: false });
   }
 };
 
@@ -119,18 +137,25 @@ export const getRecord = async (req, res) => {
       return res.status(500).json({ message: "Record not found!", ok: false });
 
     //Sending back record found
-    res.status(200).json({ data: record })
+    res.status(200).json({ data: record });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 };
 
 //-------------------------------DELETE ENTIRE RECORD----------------------------- */
+// http://localhost:8080/records/deleterecord/:id
 export const deleteRecord = async (req, res) => {
   try {
-    // http://localhost:8080/records/deleterecord/:id
     // Deleting record by record id as in req.params.id
     await Record.findByIdAndDelete(req.params.id);
+
+    let records = JSON.parse(await client.get("records"));
+    if (Array.isArray(records) && records.length > 0) {
+      records = records.filter((rec) => rec._id != req.params.id);
+      await client.set("records", JSON.stringify(records));
+    }
+
     return res.status(200).json({ message: "Record deleted!" });
   } catch (error) {
     return res.status(404).json({ message: "Record not found!" });

@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
+import connectDB from './db.js'
 import cors from "cors";
 import path from "path";
 import multer from "multer";
@@ -10,8 +10,6 @@ import userRouter from "./routes/auth.js";
 import { signup } from "./controllers/userController.js";
 import { createRecord } from "./controllers/recordController.js";
 import "dotenv/config";
-import { data } from "./data/MOCK_DATA.js";
-import Record from "./models/record.js";
 
 /**CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -54,17 +52,9 @@ app.post("/auth/signup", upload.single("image"), signup);
 app.use("/records", recordRouter);
 app.use("/auth", userRouter);
 
-mongoose
-  .connect(
-    process.env.MONGODB_URL?.replace("<password>", process.env.MONGODB_PASSWORD)
-  )
-  .then(() => {
-    console.log("DB connection established");
-  }).catch(err=>{
-    console.log(err)
-  })
+
 
 app.listen(process.env.PORT, async () => {
+  connectDB();
   console.log("Server listening on PORT: 8000");
-  // data.forEach((data) => Record.create({ ...data }));
 });

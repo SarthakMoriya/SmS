@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.1",
     "otp-generator": "^4.0.1",
-    "puppeteer": "^21.5.0"
+    "puppeteer": "^21.5.0",
+    "redis": "^4.6.13"
   }
 }
