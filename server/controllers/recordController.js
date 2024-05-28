@@ -23,7 +23,7 @@ export const getRecords = async (req, res) => {
   try {
     // http://localhost:8000/records/getrecords
     let records = JSON.parse(await client.get("records"));
-    if (records == null) {
+    if (records == null || records.length == 0) {
       records = await Record.find();
       await client.set("records", JSON.stringify(records));
     }
@@ -110,15 +110,31 @@ export const getRecord = async (req, res) => {
     // http://localhost:8080/records/getrecord/:id
     // Fetching record from id recieved through req.params.id
     const { id } = req.params;
+    let records = JSON.parse(await client.get("records"));
+    // console.log(records);
+    if (records.length > 0) {
+      let record = records.filter((record) => {
+        return record._id == id;
+      });
+      if (record.length) {
+        return res.status(200).json({ data: record });
+      } else {
+        return res
+          .status(500)
+          .json({ message: "Record not found!", ok: false });
+      }
+    } else {
+      const record = await Record.findById(id);
 
-    const record = await Record.findById(id);
+      //If wrong recordId was send
+      if (!record)
+        return res
+          .status(500)
+          .json({ message: "Record not found!", ok: false });
 
-    //If wrong recordId was send
-    if (!record)
-      return res.status(500).json({ message: "Record not found!", ok: false });
-
-    //Sending back record found
-    res.status(200).json({ data: record });
+      //Sending back record found
+      return res.status(200).json({ data: record });
+    }
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
