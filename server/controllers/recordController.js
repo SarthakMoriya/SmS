@@ -1,4 +1,6 @@
+import { RedisFlushModes } from "redis";
 import Record from "../models/record.js";
+import client from "../redis.js";
 import { pdfMaker } from "../utils/pdfMaker.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
@@ -17,20 +19,21 @@ export const createRecord = async (req, res) => {
 };
 
 //-------------------------------GETTING ALL RECORDS----------------------------- */
-
 export const getRecords = async (req, res) => {
   try {
     // http://localhost:8000/records/getrecords
-    const records = await Record.find();
+    let records = JSON.parse(await client.get("records"));
+    if (records == null) {
+      records = await Record.find();
+      await client.set("records", JSON.stringify(records));
+    }
     // Sending the records as response
     res.status(200).json(records);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 };
-
 //-------------------------------UPDATING SINGLE RECORD EXAM----------------------------- */
-
 export const updateRecordExam = async (req, res) => {
   try {
     // localhost:8000/records/updaterecord
@@ -63,7 +66,6 @@ export const updateRecordExam = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-
 //-------------------------------DELETING SINGLE RECORD EXAM----------------------------- */
 export const deleteRecordExam = async (req, res) => {
   try {
@@ -73,7 +75,7 @@ export const deleteRecordExam = async (req, res) => {
     const record = await Record.findById({ _id: id });
     // If wrong record Id was passed. Send Error message back to user
     if (!record) {
-      res.status(401).json({ message: "Record not found",ok:false });
+      res.status(401).json({ message: "Record not found", ok: false });
     }
 
     let exams = req.body.exams; //old exams array
@@ -87,12 +89,11 @@ export const deleteRecordExam = async (req, res) => {
     record.exams = newExams;
     await record.save();
 
-    res.status(201).json({ exams: newExams,ok:true });
+    res.status(201).json({ exams: newExams, ok: true });
   } catch (error) {
-    res.status(404).json({ message: error.message,ok:false });
+    res.status(404).json({ message: error.message, ok: false });
   }
 };
-
 export const updateRecordCertificate = async (req, res) => {
   try {
     await Record.findByIdAndUpdate(req.body.id, {
@@ -103,9 +104,7 @@ export const updateRecordCertificate = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
-
 //-------------------------------GETTING SINGLE RECORD----------------------------- */
-
 export const getRecord = async (req, res) => {
   try {
     // http://localhost:8080/records/getrecord/:id
@@ -119,26 +118,33 @@ export const getRecord = async (req, res) => {
       return res.status(500).json({ message: "Record not found!", ok: false });
 
     //Sending back record found
-    res.status(200).json({ data: record })
+    res.status(200).json({ data: record });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 };
-
 //-------------------------------DELETE ENTIRE RECORD----------------------------- */
 export const deleteRecord = async (req, res) => {
   try {
     // http://localhost:8080/records/deleterecord/:id
+
     // Deleting record by record id as in req.params.id
-    await Record.findByIdAndDelete(req.params.id);
+    let result = await Record.findByIdAndDelete(req.params.id);
+    if (result._id) {
+      let records = JSON.parse(await client.get("records"));
+      if (records.length > 0) {
+        let updatedRecords = records.filter(
+          (record) => record._id !== req.params.id
+        );
+        await client.set("records", JSON.stringify(updatedRecords));
+      }
+    }
     return res.status(200).json({ message: "Record deleted!" });
   } catch (error) {
     return res.status(404).json({ message: "Record not found!" });
   }
 };
-
 //-------------------------------UPDATE ENTIRE RECORD----------------------------- */
-
 export const updateRecord = async (req, res) => {
   try {
     const record = await Record.findById(req.params.id);
@@ -182,9 +188,7 @@ export const updateRecord = async (req, res) => {
     return res.status(404).json({ message: "Record not found!" });
   }
 };
-
 //-------------------------------DOWNLOAD RECORD----------------------------- */
-
 export const downloadRecord = async (req, res) => {
   try {
     const { id } = req.body.data.id;
@@ -198,7 +202,6 @@ export const downloadRecord = async (req, res) => {
     res.status(200).json({ message: "Record" });
   }
 };
-
 //-------------------------------FETCH RECORDS OF A TEACHER----------------------------- */
 export const getTeacherRecords = async (req, res) => {
   try {
@@ -208,5 +211,20 @@ export const getTeacherRecords = async (req, res) => {
     res.status(404).send({ message: "No Records", records });
   } catch (error) {}
 };
+// *********************************SAVE ALL RECORD IN CACHE*********************************
+export const saveRecordsCache = async (req, res) => {
+  try {
+    const records = await Record.find();
+    await client.set("records", JSON.stringify(records), async (err, data) => {
+      if (err) {
+        console.log("Error saving records");
+        return;
+      }
+      if (data) console.log(JSON.parse(data));
+    });
 
-// *********************************UPLOAD CERTIFICATE*********************************
+    console.log(records);
+  } catch (error) {
+    console.log(error);
+  }
+};

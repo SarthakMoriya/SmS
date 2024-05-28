@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import recordRouter from "./routes/recordRouter.js"; // Update this import statement
 import userRouter from "./routes/auth.js";
 import { signup } from "./controllers/userController.js";
-import { createRecord } from "./controllers/recordController.js";
+import { createRecord, saveRecordsCache } from "./controllers/recordController.js";
 import "dotenv/config";
 
 
@@ -64,5 +64,6 @@ mongoose
   })
 
 app.listen(process.env.PORT, async () => {
+  // saveRecordsCache();
   console.log("Server listening on PORT: 8000");
 });
