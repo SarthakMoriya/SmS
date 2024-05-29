@@ -64,6 +64,5 @@ mongoose
   })
 
 app.listen(process.env.PORT, async () => {
-  // saveRecordsCache();
   console.log("Server listening on PORT: 8000");
 });

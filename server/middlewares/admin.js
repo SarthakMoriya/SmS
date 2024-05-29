@@ -5,9 +5,10 @@ export const checkToken = (req, res, next) => {
     let token = "";
     if (req.headers.authorization.startsWith("Bearer ")) {
       token = req?.headers?.authorization.split(" ")[1];
-      // console.log(token);
-      const { iat, exp } = jwt.verify(token, process.env.JWT_PASSWORD);
-      console.log(exp < iat);
+      console.log(token);
+      const { iat,exp } = jwt.verify(token, process.env.JWT_PASSWORD);
+      
+      console.log(iat,exp);
       if (exp > iat) {
         next();
       } else {

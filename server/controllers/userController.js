@@ -201,15 +201,16 @@ export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (email === "sarthak8544@gmail.com" && password === "test") {
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
       const isAdmin = await User.findOne({ email });
       if (!isAdmin) return res.status(404).send("Invalid Credentials");
+      const {password,...others} =isAdmin._doc;
 
-      const token = jwt.sign({ id: isAdmin._id, email }, "topendseretpassword");
+      const token = jwt.sign({ id: isAdmin._id, email }, process.env.JWT_PASSWORD,{expiresIn:'1d'});
 
       return res
         .status(200)
-        .json({ token, user: isAdmin, admin: true, secretkey: 1234 });
+        .json({ token, user: others, admin: true, secretkey: 1234 });
     } else {
       return res.status(500).json("Invalid Credentials");
     }
@@ -223,12 +224,13 @@ export const adminLogin = async (req, res) => {
 export const approveAccounts = async (req, res) => {
   try {
     const { id } = req.params;
-
+    console.log(id)
     const account = await User.findById(id);
     if (!account)
       return res.status(404).json({ error: "Invalid Teacher Account!" });
     account.isAdminApprovedAccount = true;
     await account.save();
+    console.log(account)
     res.send({});
   } catch (error) {
     res.status(500).json({ error: error });
