@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  createRecord,
   deleteRecord,
   deleteRecordExam,
   downloadRecord,
@@ -22,4 +23,6 @@ router.delete("/deleterecord/:id", deleteRecord);
 router.patch("/updatefullrecord/:id", updateRecord);
 router.post('/downloadrecord', downloadRecord);
 router.get('/getstudents/:id', getTeacherRecords);
+router.post("/createrecord", createRecord);
+// app.post("/records/savecertificate", upload.single(");
 export default router;

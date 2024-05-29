@@ -46,9 +46,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
     res.status(400).json({ message: "No file selected" });
   }
 });
-app.post("/records/createrecord", upload.single("image"), createRecord);
-app.post("/records/savecertificate", upload.single("image"));
-app.post("/auth/signup", upload.single("image"), signup);
+// app.post("/records/savecertificate", upload.single("image"));
 
 app.use("/records", recordRouter);
 app.use("/auth", userRouter);

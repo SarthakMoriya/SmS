@@ -15,7 +15,7 @@ router.post("/verifyaccount",verifyAccount)
 router.post("/admin/login", adminLogin);
 router.get("/admin/approveaccounts/:id",checkToken,approveAccounts)
 router.get("/admin/getunapprovedaccounts",getUnapprovedAccounts)
-router.get("/admin/deleteunapproveaccount/:id",deleteUnapprovedAccounts)
+router.get("/admin/deleteunapproveaccount/:id",checkToken,deleteUnapprovedAccounts)
 router.get("/admin/getallaccounts",getAllAccounts)
 router.post('/editimage/:id',editImage)
 
