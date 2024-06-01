@@ -7,16 +7,16 @@ const router = express.Router();
 
 router.post("/login", login);
 router.post("/signup", signup);
-router.post("/changepassword", changePassword);
+router.post("/changepassword", checkToken,changePassword);
 router.post("/forgotpassword", forgotPassword);
-router.post("/changepasscode", changePasscode);
-router.post("/verifyemail",verifyEmail)
+router.post("/changepasscode", checkToken,changePasscode);
+router.post("/verifyemail",checkToken,verifyEmail)
 router.post("/verifyaccount",verifyAccount)
 router.post("/admin/login", adminLogin);
 router.get("/admin/approveaccounts/:id",checkToken,approveAccounts)
-router.get("/admin/getunapprovedaccounts",getUnapprovedAccounts)
+router.get("/admin/getunapprovedaccounts",checkToken,getUnapprovedAccounts)
 router.get("/admin/deleteunapproveaccount/:id",checkToken,deleteUnapprovedAccounts)
-router.get("/admin/getallaccounts",getAllAccounts)
+router.get("/admin/getallaccounts",checkToken,getAllAccounts)
 router.post('/editimage/:id',editImage)
 
 export default router;

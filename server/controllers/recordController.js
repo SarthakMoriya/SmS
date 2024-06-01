@@ -94,6 +94,7 @@ export const deleteRecordExam = async (req, res) => {
     res.status(404).json({ message: error.message, ok: false });
   }
 };
+
 export const updateRecordCertificate = async (req, res) => {
   try {
     await Record.findByIdAndUpdate(req.body.id, {
@@ -111,13 +112,12 @@ export const getRecord = async (req, res) => {
     // Fetching record from id recieved through req.params.id
     const { id } = req.params;
     let records = JSON.parse(await client.get("records"));
-    // console.log(records);
     if (records.length > 0) {
       let record = records.filter((record) => {
         return record._id == id;
       });
-      if (record.length) {
-        return res.status(200).json({ data: record });
+      if (record.length > 0) {
+        return res.status(200).json({ data: record[0] });
       } else {
         return res
           .status(500)
@@ -221,11 +221,23 @@ export const downloadRecord = async (req, res) => {
 //-------------------------------FETCH RECORDS OF A TEACHER----------------------------- */
 export const getTeacherRecords = async (req, res) => {
   try {
-    console.log("hihihih");
-    const records = await Record.find({ teacherId: req.params.id });
-    console.log(records);
-    res.status(404).send({ message: "No Records", records });
-  } catch (error) {}
+    let records = JSON.parse(await client.get("records"));
+    if (records.length > 0 && records != null) {
+      let teacherRecords = records.filter(
+        (record) => record.teacherId === req.params.id
+      );
+      if (teacherRecords.length > 0) {
+        return res.status(200).json({records});
+      } else {
+        return res.status(404).send({ message: "No Records", records });
+      }
+    } else {
+      const records = await Record.find({ teacherId: req.params.id });
+      return res.status(200), json({ message: "Records", records });
+    }
+  } catch (error) {
+    return res.status(500).json({message:"Error",error})
+  }
 };
 // *********************************SAVE ALL RECORD IN CACHE*********************************
 export const saveRecordsCache = async (req, res) => {

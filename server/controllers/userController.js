@@ -75,7 +75,7 @@ export const login = async (req, res) => {
       { id: isValidUser._id, email: isValidUser.email },
       process.env.JWT_PASSWORD,
       {
-        expiresIn: "1h",
+        expiresIn: "1s",
       }
     );
 

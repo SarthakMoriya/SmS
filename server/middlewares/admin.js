@@ -1,14 +1,15 @@
 import jwt from "jsonwebtoken";
 
 export const checkToken = (req, res, next) => {
+  console.log("Request recieved")
   try {
     let token = "";
-    console.log(req.headers.authorization);
+    console.log(token)
+    console.log(req.headers.authorization)
     if (req.headers.authorization.startsWith("Bearer ")) {
       token = req?.headers?.authorization.split(" ")[1];
       const { iat, exp } = jwt.verify(token, process.env.JWT_PASSWORD);
-
-      console.log(iat, exp);
+      // console.log(iat,exp)
       if (exp > iat) {
         next();
       } else {
@@ -25,8 +26,9 @@ export const checkToken = (req, res, next) => {
     res
       .status(500)
       .json({
+        ok:false,
         message:
-          "Internal Server Error, Pleae try again may be token is invalid",
+        "Session Expired Please login again",
         error,
       });
   }

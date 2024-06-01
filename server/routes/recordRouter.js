@@ -11,6 +11,7 @@ import {
   updateRecordCertificate,
   updateRecordExam,
 } from "../controllers/recordController.js";
+import { checkToken } from "../middlewares/admin.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.get("/getrecord/:id", getRecord);
 router.delete("/deleterecord/:id", deleteRecord);
 router.patch("/updatefullrecord/:id", updateRecord);
 router.post('/downloadrecord', downloadRecord);
-router.get('/getstudents/:id', getTeacherRecords);
+router.get('/getstudents/:id',checkToken ,getTeacherRecords);
 router.post("/createrecord", createRecord);
 // app.post("/records/savecertificate", upload.single(");
 export default router;

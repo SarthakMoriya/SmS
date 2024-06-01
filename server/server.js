@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
@@ -7,9 +6,8 @@ import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import recordRouter from "./routes/recordRouter.js"; // Update this import statement
 import userRouter from "./routes/auth.js";
-import { signup } from "./controllers/userController.js";
-import { createRecord, saveRecordsCache } from "./controllers/recordController.js";
 import "dotenv/config";
+import connectDB from "./utils/connectDb.js";
 
 
 /**CONFIGURATIONS */
@@ -35,7 +33,6 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-
 app.post("/upload", upload.single("image"), (req, res) => {
   if (req.file) {
     res.json({
@@ -46,21 +43,12 @@ app.post("/upload", upload.single("image"), (req, res) => {
     res.status(400).json({ message: "No file selected" });
   }
 });
-// app.post("/records/savecertificate", upload.single("image"));
 
+/* ROUTES */
 app.use("/records", recordRouter);
 app.use("/auth", userRouter);
 
-mongoose
-  .connect(
-    process.env.MONGODB_URL?.replace("<password>", process.env.MONGODB_PASSWORD)
-  )
-  .then(() => {
-    console.log("DB connection established");
-  }).catch(err=>{
-    console.log(err)
-  })
-
 app.listen(process.env.PORT, async () => {
+  connectDB();
   console.log("Server listening on PORT: 8000");
 });
