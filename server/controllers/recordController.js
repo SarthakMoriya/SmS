@@ -4,13 +4,14 @@ import client from "../redis.js";
 import { pdfMaker } from "../utils/pdfMaker.js";
 
 //-------------------------------CREATING RECORD----------------------------- */
-
 export const createRecord = async (req, res) => {
   try {
     // http://localhost:8000/records/createrecord
 
     const record = await Record.create({ ...req.body });
     await record.save();
+    let records = await Record.find();
+    await client.set("records", JSON.stringify(records));
     // Sending the record created as response
     res.status(200).json({ record, ok: true });
   } catch (error) {
@@ -33,7 +34,9 @@ export const getRecords = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
 //-------------------------------UPDATING SINGLE RECORD EXAM----------------------------- */
+// removed in redis branch
 export const updateRecordExam = async (req, res) => {
   try {
     // localhost:8000/records/updaterecord
@@ -66,7 +69,9 @@ export const updateRecordExam = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
 //-------------------------------DELETING SINGLE RECORD EXAM----------------------------- */
+//removed in redis branch
 export const deleteRecordExam = async (req, res) => {
   try {
     // localhost:8000/records/deleterecordexam
@@ -97,9 +102,27 @@ export const deleteRecordExam = async (req, res) => {
 
 export const updateRecordCertificate = async (req, res) => {
   try {
+    // localhost:8000/records/certificate
     await Record.findByIdAndUpdate(req.body.id, {
       certificate: req.body.certificate,
     });
+    let oldRecords = JSON.parse(await client.get("records"));
+    if (oldRecords?.length) {
+      console.log("Old record parsed")
+      let currentRec = oldRecords.find((rec) => rec._id == req.body.id);
+      if (currentRec) {
+        console.log("Found curr rec")
+        currentRec.certificate = req.body.certificate;
+        let newRecords = oldRecords.map((rec) => {
+          if (rec._id == req.body.id) {
+            rec = currentRec;
+            return rec;
+          } else return rec;
+        });
+        
+        await client.set("records", JSON.stringify(newRecords));
+      }
+    }
     res.send("Certificate Uploaded");
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -116,6 +139,7 @@ export const getRecord = async (req, res) => {
       let record = records.filter((record) => {
         return record._id == id;
       });
+      console.log(record)
       if (record.length > 0) {
         return res.status(200).json({ data: record[0] });
       } else {
@@ -212,6 +236,23 @@ export const downloadRecord = async (req, res) => {
     console.log(record);
     record.isDataUploaded = true;
     await record.save();
+    let oldRecords = JSON.parse(await client.get("records"));
+    if (oldRecords?.length) {
+      console.log("Old record parsed")
+      let currentRec = oldRecords.find((rec) => rec._id == req.body.data.id);
+      if (currentRec) {
+        console.log("Found curr rec")
+        currentRec.isDataUploaded=true
+        let newRecords = oldRecords.map((rec) => {
+          if (rec._id == req.body.data.id) {
+            rec = currentRec;
+            return rec;
+          } else return rec;
+        });
+        
+        await client.set("records", JSON.stringify(newRecords));
+      }
+    }
     pdfMaker({ name: req.body.data?.studentName, id: req.body.data?.id });
     res.status(200).json({ message: "Record", record: record });
   } catch (error) {
@@ -227,7 +268,7 @@ export const getTeacherRecords = async (req, res) => {
         (record) => record.teacherId === req.params.id
       );
       if (teacherRecords.length > 0) {
-        return res.status(200).json({records});
+        return res.status(200).json({ records });
       } else {
         return res.status(404).send({ message: "No Records", records });
       }
@@ -236,7 +277,7 @@ export const getTeacherRecords = async (req, res) => {
       return res.status(200), json({ message: "Records", records });
     }
   } catch (error) {
-    return res.status(500).json({message:"Error",error})
+    return res.status(500).json({ message: "Error", error });
   }
 };
 // *********************************SAVE ALL RECORD IN CACHE*********************************
