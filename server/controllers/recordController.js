@@ -108,10 +108,8 @@ export const updateRecordCertificate = async (req, res) => {
     });
     let oldRecords = JSON.parse(await client.get("records"));
     if (oldRecords?.length) {
-      console.log("Old record parsed")
       let currentRec = oldRecords.find((rec) => rec._id == req.body.id);
       if (currentRec) {
-        console.log("Found curr rec")
         currentRec.certificate = req.body.certificate;
         let newRecords = oldRecords.map((rec) => {
           if (rec._id == req.body.id) {
@@ -297,3 +295,13 @@ export const saveRecordsCache = async (req, res) => {
     console.log(error);
   }
 };
+
+
+export const getSimilarCoursesRecord=async(req,res)=>{
+  try {
+    const Records=await Record.find({studentCourse:req.params.name})
+    res.status(200).send(Records)
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

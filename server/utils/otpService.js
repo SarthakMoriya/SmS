@@ -32,13 +32,10 @@ export const sendOtp = (data) => {
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-        console.log(error)
       isSent = false;
     } else {
-        console.log(info.response)
       isSent = true;
     }
   });
-  //   console.log(result)
   return { otp, sent: isSent };
 };
