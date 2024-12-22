@@ -85,6 +85,7 @@ export const login = async (req, res) => {
       ok: true,
     });
   } catch (error) {
+    console.log(error)
     return res
       .status(500)
       .json({ message: "Error creating account", error: error, ok: false });
@@ -133,6 +134,7 @@ export const forgotPassword = async (req, res) => {
     await isValidEmail.save();
     res.status(200).json({ message: "Password saved", ok: true });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "ERROR UPDATING PASSWORD", ok: false });
   }
 };

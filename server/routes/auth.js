@@ -10,7 +10,7 @@ router.post("/signup", signup);
 router.post("/changepassword", checkToken,changePassword);
 router.post("/forgotpassword", forgotPassword);
 router.post("/changepasscode", checkToken,changePasscode);
-router.post("/verifyemail",checkToken,verifyEmail)
+router.post("/verifyemail",verifyEmail)
 router.post("/verifyaccount",verifyAccount)
 router.post("/admin/login", adminLogin);
 router.get("/admin/approveaccounts/:id",checkToken,approveAccounts)
